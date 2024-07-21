@@ -102,7 +102,7 @@ cd wordpress
 mv wp-config-sample.php wp-config.php
 ```
 
-3. Abra o arquivo wp-config.php e substitua as linhas
+3. Abra o arquivo __wp-config.php__ e substitua as linhas
 
 ```
 sudo vi wp-config.php
@@ -117,7 +117,65 @@ define( 'DB_USER', 'wordpressuser' );
 
 /** Database password */
 define( 'DB_PASSWORD', 'securepassword' );
+```
 
-4. Defina a **Ownership** e Permissões de Arquivo:
+4. Defina a __Ownership__ e __Permissões__ de Arquivo:
 
+```
+sudo chown -R apache:apache /var/www/html/wordpress
+```
+```
+sudo chmod -R 755 /var/www/html/wordpress
+```
+
+## Apache
+
+Configurar __Apache__ para host do WordPress
+
+- Vamos criar arquivo host virtual Apache para hospedar o __Wordpress__
+
+```
+sudo vi /etc/httpd/conf.d/wordpress.conf
+```
+
+- Adicione nesse arquivo:
+
+```
+<VirtualHost *:80>
+ServerAdmin root@localhost
+ServerName wordpress.example.com
+DocumentRoot /var/www/html/wordpress
+<Directory "/var/www/html/wordpress">
+Options Indexes FollowSymLinks
+AllowOverride all
+Require all granted
+</Directory>
+ErrorLog /var/log/httpd/wordpress_error.log
+CustomLog /var/log/httpd/wordpress_access.log common
+</VirtualHost>
+```
+
+Salve e saia 
+```
+:wq
+```
+
+- Reinicie o servidor:
+
+```
+sudo systemctl restart httpd
+```
+
+- __Verifique se as regras do firewall estão certas__
+
+```
+sudo firewall-cmd --list-all
+```
+
+- Para permitir o tráfego em uma porta específica, como a porta 80:
+```
+sudo firewall-cmd --add-port=80/tcp --permanent
+```
+```
+sudo firewall-cmd --reload
 ```
